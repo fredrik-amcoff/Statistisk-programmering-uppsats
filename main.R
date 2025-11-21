@@ -1,3 +1,5 @@
 install.packages("magick")
 library(magick)
 setwd()
+summary()
+sum()
