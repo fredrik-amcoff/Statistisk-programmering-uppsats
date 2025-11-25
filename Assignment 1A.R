@@ -2,9 +2,10 @@
 library(tidyverse)
 
 
-df <- tibble(
+data_frame <- tibble(
   x = rnorm(10),
-  y = rnorm(10)
+  y = rnorm(10),
+  z = rnorm(10)
 )
 
 groups <- c("A", "A", "B", "A", "B", "B", "B", "A", "B", "B")
