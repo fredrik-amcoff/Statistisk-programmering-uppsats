@@ -2,13 +2,15 @@
 library(tidyverse)
 
 
+n <- 100
+set.seed(123)
 data_frame <- tibble(
-  x = rnorm(10),
-  y = rnorm(10),
-  z = rnorm(10)
+  x = rnorm(n),
+  y = rnorm(n),
+  z = rnorm(n)
 )
 
-groups <- c("A", "A", "B", "A", "B", "B", "B", "A", "B", "B")
+groups <- sample(c("A", "B"), size=n, replace=TRUE)
 
 
 Welch_t_test <- function(data, group, names, alpha=0.05, bonferroni=FALSE) {
