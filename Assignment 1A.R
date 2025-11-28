@@ -14,10 +14,32 @@ groups <- sample(c("A", "B"), size=n, replace=TRUE)
 
 
 Welch_t_test <- function(data, group, names, alpha=0.05, bonferroni=FALSE) {
+  if (!is_tibble(data)) {
+    stop("Error: input data is not tibble.")
+  }
+
+  if (!"A" %in% group | !"B" %in% group) {
+    stop("Error: group must be A or B.")
+  }
+
+  if (length(group) != length(data[[1]])) {
+    stop("Error: group length must be equal to number of observations.")
+  }
+
+  if (length(colnames(data)) != length(names)) {
+    stop("Error: number of variable names must be same as number of column names.")
+  }
+
+  if (FALSE %in% (colnames(data_frame) == names)) {
+    stop("Error: variable names must be same as data column names.")
+  }
+
   n_variables <- length(names)
 
   t_vector <- numeric(n_variables)
   p_vector <- numeric(n_variables)
+
+  data[["Groups"]] <- group
 
   for (idx in 1:n_variables) {
     variable <- data[[idx]]
@@ -38,7 +60,7 @@ Welch_t_test <- function(data, group, names, alpha=0.05, bonferroni=FALSE) {
 
     df <- (((variance_a/n_a)+(variance_b/n_b))^2)/(((variance_a/n_a)^2)/(n_a-1)+((variance_b/n_b)^2)/(n_b-1))
 
-    p <- pt(t, df)
+    p <- 2 * pt(t, df)
 
     if (bonferroni == TRUE) {
       p <- min(1, n_variables * p)
@@ -47,8 +69,10 @@ Welch_t_test <- function(data, group, names, alpha=0.05, bonferroni=FALSE) {
     t_vector[idx] <- t
     p_vector[idx] <- p
   }
-
-  return(list(t=t_vector, p=p_vector))
+  structure(
+    list(t=t_vector, p=p_vector, names=names, groups=groups, data=data),
+    class="Welch_t_test"
+  )
 }
 
 obj <- Welch_t_test(data_frame, groups, c("x", "y", "z"), bonferroni=TRUE)
