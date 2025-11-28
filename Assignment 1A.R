@@ -75,5 +75,43 @@ Welch_t_test <- function(data, group, names, alpha=0.05, bonferroni=FALSE) {
   )
 }
 
-obj <- Welch_t_test(data_frame, groups, c("x", "y", "z"), bonferroni=TRUE)
+
+print.Welch_t_test <- function(self) {
+  df <- data.frame(row.names=self$names,
+    names = self$names,
+    p_value = self$p,
+    t_value = self$t
+  )
+  print(as.data.frame(t(df)))
+}
+
+plot.Welch_t_test <- function(self) {
+  data <- pivot_longer(
+    self$data,
+    cols = 1:(length(self$names)),
+    names_to = "Variables",
+    values_to = "Values"
+  )
+  ggplot(data, aes(
+    x = Variables,
+    y = Values,
+    color = Groups
+)) +
+  geom_jitter(
+    position = position_dodge(width = 0.1)
+  ) +
+  scale_color_manual(
+    values = c(
+      "A" = "blue",
+      "B" = "red"
+    )
+  )
+}
+
+
+obj <- Welch_t_test(data_frame, groups, c("x", "y", "z"))
+#res <- t.test(x ~ groups, data=data_frame, var.equal=FALSE)
+print(obj)
+plot(obj)
+
 
