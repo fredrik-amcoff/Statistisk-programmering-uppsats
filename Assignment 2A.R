@@ -104,6 +104,57 @@ SimFun <- function(n, sim_reps, seed, lambda) {
 }
 
 
+# Function for plotting estimated variances
+# sim_reps: number of simulations
+# seed: seed for reproducibility
+# lambda: error variance weight
+PlotSim <- function(sim_reps, seed, lambda){
+  # sample isze vector
+  sample_size <- c(25, 50, 100, 200, 400)
+  # Placeholder vectors for estimates
+  sim_vector_ols <- numeric(length(sample_size))
+  sim_vector_wls <- numeric(length(sample_size))
+  sim_vector_fwls_t <- numeric(length(sample_size))
+  sim_vector_fwls_f <- numeric(length(sample_size))
+  for (i in 1:length(sample_size)) {  # loops through sample sizes
+    n <- sample_size[[i]]  # current sample size
+    simulations <- SimFun(n, sim_reps, seed, lambda)  # simulation result
+
+    # append to placeholder vectors
+    sim_vector_ols[[i]] <- simulations[[1]]
+    sim_vector_wls[[i]] <- simulations[[2]]
+    sim_vector_fwls_t[[i]] <- simulations[[3]]
+    sim_vector_fwls_f[[i]] <- simulations[[4]]
+  }
+  # Plot of variance estimates
+    # data preparation for ggplot
+    tibble(ols = sim_vector_ols,
+           wls = sim_vector_wls,
+           fwls_t = sim_vector_fwls_t,
+           fwls_f = sim_vector_fwls_f,
+           sample_size = sample_size) %>%
+    pivot_longer(cols = c(ols, wls, fwls_t, fwls_f), names_to = "Estimates", values_to = "Estimate_variance") %>%
+    # Create plot
+    ggplot(aes(x = sample_size, y = Estimate_variance)) +
+    geom_line(aes(color = Estimates)) +  # group by estimator
+    scale_x_continuous(breaks = sample_size) +  # scale the x-axis
+    labs( #Label names
+        x = "Sample size",
+        y = "Estimate variance") +
+    scale_color_discrete( # Legend names
+      labels = c("OLS", "WLS", "FWLS True", "FWLS False")) +
+    # theme settings
+    theme(panel.grid.major = element_line(colour = "gray80"),
+          panel.grid.minor = element_blank(),
+          plot.background = element_rect(fill = "gray93"),
+          axis.ticks.y = element_line(colour = "gray93"),
+          axis.ticks.x = element_line(colour = "gray93"),
+          legend.position.inside = c(0.8, 0.7))
+}
+
+PlotSim(100, 125, 3)
+
+
 
 testData <- cbind( c(0.62, 0.18, 3.92, 0.80, -5.15),
                    c(0.44, 1.49, 0.69, 0.13, 1.90))
