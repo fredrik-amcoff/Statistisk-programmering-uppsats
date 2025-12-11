@@ -69,12 +69,7 @@ fwlsFun <- function(data, trueVar){
 DataFun <- function(n, lambda) {
   x <- runif(n, 0, 2)  # x-values, U(0,2)-distributed
   var_vector <- exp(x*lambda)  # vector with error variances (dependent on x and lambda)
-  epsilon_vector <- numeric(n)  # placeholder vector for error terms
-  for (i in seq_along(var_vector)) {  # sample N(0, exp(x_i*sigma_i))-distributed error terms
-    var <- var_vector[[i]]  # variance
-    epsilon <- rnorm(1, 0, sqrt(var))  # error term
-    epsilon_vector[[i]] <- epsilon  # append error term to vector
-  }
+  epsilon_vector <- rnorm(rep(0, n), sqrt(var_vector))  # error term estimates
   beta <- 2
   y <- beta*x + epsilon_vector  # calculate y-values
   output_matrix <- cbind(y, x)  # combine x and y to matrix
